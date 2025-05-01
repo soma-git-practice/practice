@@ -1,11 +1,17 @@
-require 'pry'
 require 'sinatra'
+require_relative 'common'
 
 get '/' do
   erb :index
 end
 
-get '/item', provides: 'json' do
-  data = { name: '太郎' }
-  data.to_json
+get '/users/:page', provides: 'json' do
+  head = (params[:page].to_i - 1) * 5
+  users = User.limit(5).offset(head)
+
+  if head.negative? || users == []
+    raise not_found
+  end
+
+  users.to_json
 end
